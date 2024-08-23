@@ -32,10 +32,13 @@ export class AuthController {
   testMail() {
     this.mailerService.sendMail({
       to: 'thanhpt21.it@gmail.com', // list of receivers
-     
       subject: 'Testing Nest MailerModule ✔', // Subject line
       text: 'welcome', // plaintext body
-      html: '<b>Xin chào với devdown</b>', // HTML body content
+      template: "register.hbs",
+      context: {
+        name: "Dev Down",
+        activationCode: 123456789
+      }
     })
     return "ok"
   }
