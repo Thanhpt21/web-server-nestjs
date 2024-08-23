@@ -7,6 +7,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { hashPassword } from '@/helpers/utils';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class UsersService {
@@ -86,5 +89,32 @@ export class UsersService {
       throw new BadRequestException("Invalid Id")
     }
    
+  }
+
+  async register(registerDto: CreateAuthDto) {
+    const { name, email, password } = registerDto;
+  
+    const isExitsEmail = await this.isEmailExit(email);
+    if(isExitsEmail){
+      throw new BadRequestException(`Email đã tồn tại: ${email}. Vui lòng chọn email khác`)
+    }
+
+    try {
+      const hashedPassword = await hashPassword(password);
+
+      const user = await this.userModel.create({
+        name,
+        email,
+        password: hashedPassword,
+        isActive: false,
+        codeId: uuidv4(),
+        codeExpired: dayjs().add(1, 'minutes'),
+      });
+
+      
+      return { _id: user._id};
+    } catch (error) {
+      throw new Error('Error creating user');
+    }
   }
 }
