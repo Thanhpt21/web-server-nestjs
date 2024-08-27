@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { hashPassword } from '@/helpers/utils';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
-import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { CodeAuthDto, CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -23,11 +23,11 @@ export class UsersService {
     const isExits = await this.userModel.exists({email})
     if(isExits) return true;
     return false;
-  } 
+  }
 
   async create(createUserDto: CreateUserDto) {
     const { name, email, password } = createUserDto;
-    
+
 
     const isExitsEmail = await this.isEmailExit(email);
     if(isExitsEmail){
@@ -44,12 +44,12 @@ export class UsersService {
       });
 
       await user.save();
-      
+
       return { _id: user._id.toString() };
     } catch (error) {
       throw new Error('Error creating user');
     }
-  
+
   }
 
   async findAll(query: string, current: number, pageSize: number) {
@@ -92,41 +92,63 @@ export class UsersService {
     }else{
       throw new BadRequestException("Invalid Id")
     }
-   
+
   }
 
-  async register(registerDto: CreateAuthDto) {
+  async handleRegister(registerDto: CreateAuthDto) {
     const { name, email, password } = registerDto;
   
     const isExitsEmail = await this.isEmailExit(email);
-    if(isExitsEmail){
-      throw new BadRequestException(`Email đã tồn tại: ${email}. Vui lòng chọn email khác`)
+    if (isExitsEmail) {
+      throw new BadRequestException(`Email đã tồn tại: ${email}. Vui lòng chọn email khác`);
     }
 
-    try {
-      const hashedPassword = await hashPassword(password);
-      const codeId = uuidv4()
+    const hashedPassword = await hashPassword(password);
+      const codeId = uuidv4();
       const user = await this.userModel.create({
         name,
         email,
         password: hashedPassword,
         isActive: false,
         codeId: codeId,
-        codeExpired: dayjs().add(30, 'seconds'),
+        codeExpired: dayjs().add(5, 'minute'),
+      });
+  
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Kích hoạt tài khoản ✔',
+        template: 'register.hbs',
+        context: {
+          name: user.name ?? user.email,
+          activationCode: codeId,
+        },
       });
 
-      this.mailerService.sendMail({
-        to: user.email, // list of receivers
-      subject: 'Kích hoạt tài khoản ✔', // Subject line
-      template: "register.hbs",
-      context: {
-        name: user?.name ?? user?.email,
-        activationCode: codeId
-      }
-      })
-      return { _id: user._id.toString() };
-    } catch (error) {
-      throw new Error('Error creating user');
+  
+      return { _id: user._id }; 
+  
+    // try {
+      
+    // } catch (error) {
+    //   throw new Error('Error creating user');
+    // }
+  }
+
+  async handleActiveCode(data: CodeAuthDto){
+    const user= await this.userModel.findOne({
+      _id: data._id,
+      codeId: data.code
+    })
+
+    if(!user){
+      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
+    }
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+    if(isBeforeCheck){
+      await this.userModel.updateOne({_id: data._id}, {isActive: true})
+      return {isBeforeCheck}
+    }else{
+      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
     }
   }
 }

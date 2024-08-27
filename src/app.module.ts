@@ -20,6 +20,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TransformInterceptor } from './core/transform.interceptor';
 
+
 @Module({
   imports: [
     UsersModule,
@@ -73,12 +74,12 @@ import { TransformInterceptor } from './core/transform.interceptor';
   controllers: [AppController],
   providers: [AppService, 
     { 
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard,
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
     { 
-    provide: APP_INTERCEPTOR,
-    useClass: TransformInterceptor,
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
     }
 ],
 })

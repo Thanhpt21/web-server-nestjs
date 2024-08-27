@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request }
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { Public, ResponseMessage } from '@/decorator/customize';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CodeAuthDto, CreateAuthDto } from './dto/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 
 
@@ -24,8 +24,15 @@ export class AuthController {
 
   @Post("register")
   @Public()
-  register(@Body() registerDto: CreateAuthDto) {
-    return this.authService.register(registerDto)
+  @ResponseMessage("Đăng ký thành công")
+  resgister(@Body() registerDto: CreateAuthDto) {
+     return this.authService.handleRegister(registerDto)
+  }
+
+  @Post("check-code")
+  @Public()
+  checkCode(@Body() registerDto: CodeAuthDto) {
+    return this.authService.checkCode(registerDto)
   }
 
   @Get("mail")
