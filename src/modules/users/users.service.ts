@@ -151,4 +151,31 @@ export class UsersService {
       throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
     }
   }
+
+  async retryActive (email:string) {
+    const codeId = uuidv4();
+    const user = await this.userModel.findOne({email})
+    if(!user){
+      throw new BadRequestException("Tài khoản không tồn tại")
+    }
+    if(user.isActive === true){
+      throw new BadRequestException("Tài khoản đã được kích hoạt")
+    }
+
+    await user.updateOne({
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minute'),
+    });
+    
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Kích hoạt tài khoản ✔',
+      template: 'register.hbs',
+      context: {
+        name: user.name ?? user.email,
+        activationCode: codeId,
+      },
+    });
+    return {_id: user._id}
+  }
 }
