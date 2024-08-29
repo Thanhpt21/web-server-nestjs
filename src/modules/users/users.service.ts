@@ -71,7 +71,15 @@ export class UsersService {
     .skip(skip)
     .select("-password")
     .sort(sort as any)
-    return {data, totalPages};
+    return {
+      meta: {
+        current: current,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+      },
+      data
+    }
   }
 
   findOne(id: number) {
@@ -83,8 +91,40 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateOne({_id: updateUserDto._id}, {...updateUserDto});
+    const { _id, name, phone, address } = updateUserDto;
+
+    // Xác thực ID người dùng
+    if (!mongoose.isValidObjectId(_id)) {
+        throw new BadRequestException('ID người dùng không hợp lệ');
+    }
+
+    // Tạo đối tượng payload để cập nhật
+    const updatePayload: Partial<UpdateUserDto> = {};
+    if (name) updatePayload.name = name;
+    if (phone) updatePayload.phone = phone;
+    if (address) updatePayload.address = address;
+
+    try {
+        // Thực hiện cập nhật
+        const result = await this.userModel.updateOne(
+            { _id },
+            { $set: updatePayload }
+        );
+
+        // Kiểm tra kết quả cập nhật
+        if (result.matchedCount === 0) {
+            throw new BadRequestException('Không tìm thấy người dùng');
+        }
+        if (result.modifiedCount === 0) {
+            throw new BadRequestException('Không có thay đổi nào được thực hiện hoặc không có trường nào cần cập nhật');
+        }
+
+        return { success: true };
+    } catch (error) {
+        throw new Error('Lỗi khi cập nhật người dùng: ' + error.message);
+    }
   }
+
 
   async remove(_id: string) {
     if(mongoose.isValidObjectId(_id)){

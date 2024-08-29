@@ -15,19 +15,14 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
   constructor(private reflector: Reflector) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-    console.log('TransformInterceptor: intercept method called');
     
     return next.handle().pipe(
       map((data) => {
-        console.log('Data from handler:', data);
-
         const response = {
           statusCode: context.switchToHttp().getResponse().statusCode,
           message: this.reflector.get<string>(RESPONSE_MESSAGE, context.getHandler()) || '',
           data: data,
         };
-
-        console.log('Response data transformed by interceptor:', response);
         return response;
       }),
     );
