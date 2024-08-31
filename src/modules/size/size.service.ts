@@ -1,32 +1,31 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './schemas/category.schema';
+import { CreateSizeDto } from './dto/create-size.dto';
+import { UpdateSizeDto } from './dto/update-size.dto';
+import { Size } from './schemas/size.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 
 @Injectable()
-export class CategoriesService {
+export class SizesService {
   constructor(
-    @InjectModel(Category.name) private categoryModel: Model<Category>
+    @InjectModel(Size.name) private sizeModel: Model<Size>
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const { title, image } = createCategoryDto;
+  async create(createSizeDto: CreateSizeDto) {
+    const { title } = createSizeDto;
 
     try {
-      const category = new this.categoryModel({
+      const size = new this.sizeModel({
         title,
-        image,
       });
 
-      await category.save();
+      await size.save();
 
-      return { _id: category._id.toString() };
+      return { _id: size._id.toString() };
     } catch (error) {
-      throw new Error('Error creating category');
+      throw new Error('Error creating size: ' + error.message);
     }
   }
 
@@ -39,11 +38,11 @@ export class CategoriesService {
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
 
-    const totalItems = (await this.categoryModel.find(filter)).length;
+    const totalItems = (await this.sizeModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / pageSize);
     const skip = (+current - 1) * (+pageSize);
 
-    const data = await this.categoryModel
+    const data = await this.sizeModel
       .find(filter)
       .limit(pageSize)
       .skip(skip)
@@ -64,30 +63,27 @@ export class CategoriesService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('ID không hợp lệ');
     }
-    return this.categoryModel.findById(id);
+    return this.sizeModel.findById(id);
   }
 
-  async update(updateCategoryDto: UpdateCategoryDto) {
-    const { _id, title, image } = updateCategoryDto;
+  async update(updateSizeDto: UpdateSizeDto) {
+    const { _id, title } = updateSizeDto;
 
     if (!mongoose.isValidObjectId(_id)) {
       throw new BadRequestException('ID không hợp lệ');
     }
 
-   
-
     try {
-      const updatePayload: Partial<UpdateCategoryDto> = {};
+      const updatePayload: Partial<UpdateSizeDto> = {};
       if (title) updatePayload.title = title;
-      if (image) updatePayload.image = image;
 
-      const result = await this.categoryModel.updateOne(
+      const result = await this.sizeModel.updateOne(
         { _id },
         { $set: updatePayload }
       );
 
       if (result.matchedCount === 0) {
-        throw new BadRequestException('Không tìm thấy danh mục');
+        throw new BadRequestException('Không tìm thấy kích thước');
       }
       if (result.modifiedCount === 0) {
         throw new BadRequestException('Không có thay đổi nào được thực hiện hoặc không có trường nào cần cập nhật');
@@ -95,13 +91,13 @@ export class CategoriesService {
 
       return { success: true };
     } catch (error) {
-      throw new Error('Lỗi khi cập nhật danh mục: ' + error.message);
+      throw new Error('Lỗi khi cập nhật kích thước: ' + error.message);
     }
   }
 
   async remove(id: string) {
     if (mongoose.isValidObjectId(id)) {
-      return this.categoryModel.deleteOne({ _id: id });
+      return this.sizeModel.deleteOne({ _id: id });
     } else {
       throw new BadRequestException('ID không hợp lệ');
     }

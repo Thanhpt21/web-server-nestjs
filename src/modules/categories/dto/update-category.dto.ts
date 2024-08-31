@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsString, IsMongoId, IsNotEmpty } from 'class-validator';
 
 export class UpdateCategoryDto {
     @IsMongoId({message: "_Id không hợp lệ"})
@@ -11,9 +11,4 @@ export class UpdateCategoryDto {
 
     @IsOptional()
     image?: string;
-
-    @IsOptional()
-    @IsArray({ message: "Brands phải là một mảng" })
-    @IsMongoId({ each: true, message: "Mỗi phần tử trong Brands phải là một ObjectId hợp lệ" })
-    brands?: string[];
 }

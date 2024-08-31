@@ -14,7 +14,11 @@ import { TransformInterceptor } from './core/transform.interceptor';
 import { UsersModule } from '@/modules/users/users.module';
 import { UploadModule } from '@/upload/upload.module';
 import { CategoriesModule } from '@/modules/categories/categories.module';
-import { BlogCategoriesModule } from './modules/blogCategories/blogcategories.module';
+import { BlogCategoriesModule } from '@/modules/blogCategories/blogcategories.module';
+import { ColorsModule } from '@/modules/color/color.module';
+import { SizesModule } from './modules/size/size.module';
+import { BrandsModule } from './modules/brands/brand.module';
+import { BlogModule } from './modules/blog/blog.module';
 
 
 
@@ -24,6 +28,10 @@ import { BlogCategoriesModule } from './modules/blogCategories/blogcategories.mo
     UsersModule,
     CategoriesModule,
     BlogCategoriesModule,
+    ColorsModule,
+    SizesModule,
+    BrandsModule,
+    BlogModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({

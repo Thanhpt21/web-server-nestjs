@@ -6,14 +6,13 @@ export type BrandDocument = HydratedDocument<Brand>;
 @Schema({ timestamps: true })
 export class Brand {
     @Prop({ required: true })
-    name: string;
+    title: string; // Đảm bảo tên trường là 'title'
 
     @Prop()
     image: string;
 
-    @Prop()
-    category: MongooseSchema.Types.ObjectId;
+    @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Category' })
+    category: MongooseSchema.Types.ObjectId[];
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);
-

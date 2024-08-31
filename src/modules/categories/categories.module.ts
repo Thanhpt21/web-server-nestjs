@@ -8,8 +8,10 @@ import { Brand, BrandSchema } from '../brands/schemas/brand.schema';
 @Module({
   imports: 
   [
-    MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]),
-    MongooseModule.forFeature([{ name: Brand.name, schema: BrandSchema }]), // Thêm nếu cần
+    MongooseModule.forFeature([
+      { name: Category.name, schema: CategorySchema },
+      { name: Brand.name, schema: BrandSchema }, // Kết hợp tất cả các schema vào một mảng
+    ]),
     ],
   controllers: [CategoriesController],
   providers: [CategoriesService],
