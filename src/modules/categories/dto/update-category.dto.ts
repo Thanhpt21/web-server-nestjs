@@ -10,7 +10,6 @@ export class UpdateCategoryDto {
     title?: string;
 
     @IsOptional()
-    @IsString({ message: "Image phải là một chuỗi" })
     image?: string;
 
     @IsOptional()

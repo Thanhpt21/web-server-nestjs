@@ -14,6 +14,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
 import { UsersModule } from '@/modules/users/users.module';
 import { UploadModule } from '@/upload/upload.module';
 import { CategoriesModule } from '@/modules/categories/categories.module';
+import { BlogCategoriesModule } from './modules/blogCategories/blogcategories.module';
 
 
 
@@ -22,6 +23,7 @@ import { CategoriesModule } from '@/modules/categories/categories.module';
     UploadModule,
     UsersModule,
     CategoriesModule,
+    BlogCategoriesModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
