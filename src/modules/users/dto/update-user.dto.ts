@@ -1,19 +1,23 @@
-import { IsMongoId, IsNotEmpty, IsOptional } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class UpdateUserDto {
-    @IsMongoId({message: "_Id không hợp lệ"})
-    @IsNotEmpty({message: "_Id không được để trống"})
+    @IsMongoId({ message: "_id không hợp lệ" })
+    @IsNotEmpty({ message: "_id không được để trống" })
     _id: string;
 
     @IsOptional()
-    name: string;
+    @IsString({ message: "Tên phải là một chuỗi" })
+    name?: string;
 
     @IsOptional()
-    phone: string;
+    @IsString({ message: "Số điện thoại phải là một chuỗi" })
+    phone?: string;
 
     @IsOptional()
-    address: string;
+    @IsString({ message: "Địa chỉ phải là một chuỗi" })
+    address?: string;
 
     @IsOptional()
-    image: string; 
+    @IsString({ message: "Hình ảnh phải là một chuỗi" })
+    image?: string;
 }

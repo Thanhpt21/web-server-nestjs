@@ -91,7 +91,7 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const { _id, name, phone, address } = updateUserDto;
+    const { _id, name, phone, address, image } = updateUserDto;
 
     // Xác thực ID người dùng
     if (!mongoose.isValidObjectId(_id)) {
@@ -103,6 +103,7 @@ export class UsersService {
     if (name) updatePayload.name = name;
     if (phone) updatePayload.phone = phone;
     if (address) updatePayload.address = address;
+    if (image) updatePayload.image = image;
 
     try {
         // Thực hiện cập nhật

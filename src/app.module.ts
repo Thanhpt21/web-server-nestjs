@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
-import { UsersModule } from '@/modules/users/users.module';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,10 +11,17 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { TransformInterceptor } from './core/transform.interceptor';
 
+import { UsersModule } from '@/modules/users/users.module';
+import { UploadModule } from '@/upload/upload.module';
+import { CategoriesModule } from '@/modules/categories/categories.module';
+
+
 
 @Module({
   imports: [
+    UploadModule,
     UsersModule,
+    CategoriesModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
