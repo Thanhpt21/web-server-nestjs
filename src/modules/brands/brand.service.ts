@@ -126,14 +126,18 @@ export class BrandsService {
 
 
   async findBrandsByCategoryId(categoryId: string) {
-    if (!mongoose.isValidObjectId(categoryId)) {
+    // Kiểm tra nếu categoryId có phải là ObjectId hợp lệ không
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       throw new BadRequestException('ID danh mục không hợp lệ');
     }
-
+  
     try {
+      // Chuyển categoryId thành ObjectId
+      const objectId = new mongoose.Types.ObjectId(categoryId);
+  
       // Tìm các thương hiệu có chứa ID danh mục trong trường category
-      const brands = await this.brandModel.find({ category: categoryId }).exec();
-
+      const brands = await this.brandModel.find({ category: objectId }).exec();
+  
       return brands;
     } catch (error) {
       throw new BadRequestException('Error fetching brands: ' + error.message);

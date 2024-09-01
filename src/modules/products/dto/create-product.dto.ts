@@ -1,86 +1,117 @@
-import { IsNotEmpty, IsString, IsNumber, IsArray, IsOptional, IsEnum } from 'class-validator';
-import { Types } from 'mongoose'; // If you use Mongoose
-
-enum Status {
-  IN_STOCK = "Còn hàng",
-  OUT_OF_STOCK = "Hết hàng",
-}
+import { IsArray, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import mongoose from 'mongoose';
 
 export class CreateProductDto {
-  @IsNotEmpty({ message: 'Title không được để trống' })
-  @IsString()
-  title: string;
+    @IsString()
+    @IsNotEmpty()
+    title: string;
 
-  @IsString()
-  slug: string;
+    @IsString()
+    @IsNotEmpty()
+    slug: string;
 
-  @IsNotEmpty({ message: 'Description không được để trống' })
-  @IsString()
-  description: string;
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 
-  @IsNotEmpty({ message: 'Mã sản phẩm không được để trống' })
-  @IsString()
-  code: string;
+    @IsString()
+    @IsNotEmpty()
+    code: string;
 
-  @IsOptional() 
-  brand?: Types.ObjectId;
+    @IsMongoId()
+    @IsNotEmpty()
+    brand: string;
 
-  @IsNotEmpty({ message: 'Thumb không được để trống' })
-  @IsString()
-  thumb: string;
+    @IsString()
+    @IsNotEmpty()
+    thumb: string;
 
-  @IsNotEmpty({ message: 'Price không được để trống' })
+    @IsArray()
+    @IsString({ each: true })
+    images: string[];
+
+    @IsNumber()
+    @IsNotEmpty()
+    price: number;
+
+    @IsNumber()
+    discount: number;
+
+    @IsMongoId()
+    @IsNotEmpty()
+    category: string;
+
+    @IsEnum([1, 2])
+    @IsOptional()
+    status?: number;
+
+    @IsNumber()
+    @IsOptional()
+    sold?: number;
+
+    @IsArray()
+    @IsMongoId({ each: true })
+    @IsOptional()
+    colors?: mongoose.Schema.Types.ObjectId[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => VariantDto)
+    @IsOptional()
+    variants?: VariantDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => RatingDto)
+    @IsOptional()
+    ratings?: RatingDto[];
+
+    @IsNumber()
+    @IsOptional()
+    totalratings?: number;
+
+    @IsArray()
+    @IsString({ each: true })
+    @IsOptional()
+    tags?: string[];
+}
+
+class RatingDto {
   @IsNumber()
-  price: number;
+  star: number;
 
-  @IsNotEmpty({ message: 'Discount không được để trống' })
-  @IsNumber()
-  discount: number;
+  @IsString()
+  comment: string;
 
-  @IsOptional() 
-  category?: Types.ObjectId;
-
-  @IsOptional() 
-  @IsEnum(Status)
-  status?: Status;
+  @IsMongoId()
+  postedby: string;
 
   @IsOptional()
-  @IsNumber()
-  sold?: number;
+  updatedAt?: Date;
+}
 
-  @IsOptional()
-  @IsArray()
-  images?: string[];
+class VariantDto {
+    @IsArray()
+    @IsMongoId({ each: true })
+    colors: string[];
 
-  @IsOptional() 
-  color?: Types.ObjectId;
+    @IsNumber()
+    price: number;
 
-  @IsOptional()
-  @IsArray()
-  ratings?: Array<{
-    star: number;
-    comment: string;
-    postedby: Types.ObjectId;
-    updatedAt?: Date;
-  }>;
+    @IsNumber()
+    discount: number;
 
-  @IsOptional()
-  @IsNumber()
-  totalratings?: number;
+    @IsString()
+    thumb: string;
 
-  @IsOptional()
-  @IsArray()
-  variants?: Array<{
-    color?: Types.ObjectId;
-    price?: number;
-    discount?: number;
-    thumb?: string;
-    images?: string[];
-    title?: string;
-    sku?: string;
-  }>;
+    @IsArray()
+    @IsString({ each: true })
+    images: string[];
 
-  @IsOptional()
-  @IsArray()
-  tags?: string[];
+    @IsString()
+    title: string;
+
+    @IsString()
+    sku: string;
 }
