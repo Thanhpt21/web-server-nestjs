@@ -1,6 +1,6 @@
 import { BlogCategory } from '@/modules/blogCategories/schemas/blogcategory.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
@@ -26,8 +26,8 @@ export class Blog {
     })
     content: { title: string; body: string }[];
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: BlogCategory.name }] })
-    category: Types.ObjectId[]; // Tham chiếu tới BlogCategory
+    @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'BlogCategory' })
+    category: MongooseSchema.Types.ObjectId[];
 
     @Prop({ default: 0 })
     numberViews: number;
@@ -41,8 +41,8 @@ export class Blog {
     @Prop({ default: 'Admin' })
     author: string;
 
-    @Prop({ type: [Types.ObjectId], ref: 'User' }) // Giả sử bạn có schema User và muốn lưu danh sách người đã xem
-    viewedBy: Types.ObjectId[];
+    @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'User' })
+    viewedBy: MongooseSchema.Types.ObjectId[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

@@ -19,7 +19,7 @@ export class CreateBlogDto {
     content?: { title: string; body: string }[];
 
     @IsArray()
-    @IsMongoId({ each: true })
+    @IsMongoId({ each: true, message: "Mỗi phần tử trong mảng category phải là một ObjectId hợp lệ" })
     @IsOptional()
     category?: mongoose.Schema.Types.ObjectId[];
 

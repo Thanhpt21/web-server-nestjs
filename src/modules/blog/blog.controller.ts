@@ -18,9 +18,10 @@ export class BlogsController {
     async findAll(
         @Query() query: string,
         @Query('current') current: string,
-        @Query('pageSize') pageSize: string
+        @Query('pageSize') pageSize: string,
+        @Query('category') category: string
     ) {
-        return this.blogsService.findAll(query, +current, +pageSize);
+        return this.blogsService.findAll(query, +current, +pageSize, category);
     }
 
     @Get(':id')

@@ -18,14 +18,6 @@ export class BlogsService {
         const { title, image, description, content, category, author } = createBlogDto;
 
         try {
-            // Validate categories
-            if (category) {
-                const validCategories = await this.blogCategoryModel.find({ _id: { $in: category } }).exec();
-                if (validCategories.length !== category.length) {
-                    throw new BadRequestException('Một hoặc nhiều danh mục không hợp lệ');
-                }
-            }
-
             const blog = new this.blogModel({
                 title,
                 image,
@@ -47,7 +39,7 @@ export class BlogsService {
         }
     }
 
-    async findAll(query: string, current: number, pageSize: number) {
+    async findAll(query: string, current: number, pageSize: number,  category: string) {
         const { filter, sort } = aqp(query);
 
         if (filter.current) delete filter.current;
@@ -55,6 +47,10 @@ export class BlogsService {
 
         if (!current) current = 1;
         if (!pageSize) pageSize = 10;
+
+        if (filter.category) {
+            filter.category = { $in: filter.category }; // Giả sử filter.category là mảng ID của danh mục
+        }
 
         const totalItems = await this.blogModel.countDocuments(filter).exec();
         const totalPages = Math.ceil(totalItems / pageSize);
@@ -67,9 +63,9 @@ export class BlogsService {
             .sort(sort as any)
             .populate({
                 path: 'category',
-                select: '_id title'
-            })
-            .exec();
+                select: '_id title',
+              })
+              .exec();
 
         return {
             meta: {
@@ -99,7 +95,7 @@ export class BlogsService {
     }
 
     async update(updateBlogDto: UpdateBlogDto) {
-        const { _id, content } = updateBlogDto;
+        const { _id, content, category } = updateBlogDto;
         if (!mongoose.isValidObjectId(_id)) {
             throw new BadRequestException('ID không hợp lệ');
         }
@@ -111,13 +107,8 @@ export class BlogsService {
             if (updateBlogDto.image) updatePayload.image = updateBlogDto.image;
             if (updateBlogDto.description) updatePayload.description = updateBlogDto.description;
             if (updateBlogDto.content) updatePayload.content = content;
-            if (updateBlogDto.category) {
-                // Validate categories
-                const validCategories = await this.blogCategoryModel.find({ _id: { $in: updateBlogDto.category } }).exec();
-                if (validCategories.length !== updateBlogDto.category.length) {
-                    throw new BadRequestException('Một hoặc nhiều danh mục không hợp lệ');
-                }
-                updatePayload.category = updateBlogDto.category;
+            if (updateBlogDto.category) { 
+                updatePayload.category = category;
             }
             if (updateBlogDto.numberViews) updatePayload.numberViews = updateBlogDto.numberViews;
             if (updateBlogDto.likes) updatePayload.likes = updateBlogDto.likes;

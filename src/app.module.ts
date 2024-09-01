@@ -19,6 +19,10 @@ import { ColorsModule } from '@/modules/color/color.module';
 import { SizesModule } from './modules/size/size.module';
 import { BrandsModule } from './modules/brands/brand.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { CouponModule } from './modules/coupon/coupon.module';
+import { ShipModule } from './modules/ship/ship.module';
+import { EnquiryModule } from './modules/enquiry/enquiry.module';
+import { ConfigsModule } from './modules/config/config.module';
 
 
 
@@ -32,6 +36,10 @@ import { BlogModule } from './modules/blog/blog.module';
     SizesModule,
     BrandsModule,
     BlogModule,
+    CouponModule,
+    ShipModule,
+    EnquiryModule,
+    ConfigsModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({

@@ -70,7 +70,6 @@ export class BrandsService {
     if (!current) current = 1;
     if (!pageSize) pageSize = 10;
 
-      // Xử lý lọc theo danh mục nếu có
       if (filter.category) {
         filter.category = { $in: filter.category }; // Giả sử filter.category là mảng ID của danh mục
     }
