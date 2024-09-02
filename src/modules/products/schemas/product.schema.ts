@@ -35,7 +35,7 @@ export class Product {
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
     category: MongooseSchema.Types.ObjectId;
 
-    @Prop({ default: 1, enum: [1,2] })
+    @Prop({ default: 1, enum: [1, 2] })
     status: number;
 
     @Prop({ default: 0 })
@@ -63,31 +63,6 @@ export class Product {
 
     @Prop({ default: 0 })
     totalratings: number;
-
-    @Prop({
-        type: [
-            {
-                colors: [
-                    { type: MongooseSchema.Types.ObjectId, ref: 'Color' }
-                ],
-                price: { type: Number },
-                discount: { type: Number },
-                thumb: { type: String },
-                images: { type: [String] },
-                title: { type: String },
-                sku: { type: String },
-            },
-        ],
-    })
-    variants: {
-        colors: MongooseSchema.Types.ObjectId[];
-        price: number;
-        discount: number;
-        thumb: string;
-        images: string[];
-        title: string;
-        sku: string;
-    }[];
 
     @Prop({ type: [String] })
     tags: string[];

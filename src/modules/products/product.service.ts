@@ -30,7 +30,6 @@ export class ProductsService {
       colors,
       ratings,
       totalratings,
-      variants,
       tags
     } = createProductDto;
 
@@ -51,7 +50,6 @@ export class ProductsService {
         colors,
         ratings,
         totalratings: totalratings || 0,
-        variants,
         tags
       });
 

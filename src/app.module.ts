@@ -25,6 +25,7 @@ import { EnquiryModule } from './modules/enquiry/enquiry.module';
 import { ConfigsModule } from './modules/config/config.module';
 import { StoreModule } from './modules/store/store.module';
 import { ProductsModule } from './modules/products/product.module';
+import { VariantsModule } from './modules/variants/variant.module';
 
 
 
@@ -44,6 +45,7 @@ import { ProductsModule } from './modules/products/product.module';
     ConfigsModule,
     StoreModule,
     ProductsModule,
+    VariantsModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({

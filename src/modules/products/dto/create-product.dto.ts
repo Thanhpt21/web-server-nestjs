@@ -55,11 +55,6 @@ export class CreateProductDto {
     @IsOptional()
     colors?: mongoose.Schema.Types.ObjectId[];
 
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => VariantDto)
-    @IsOptional()
-    variants?: VariantDto[];
 
     @IsArray()
     @ValidateNested({ each: true })
@@ -91,27 +86,3 @@ class RatingDto {
   updatedAt?: Date;
 }
 
-class VariantDto {
-    @IsArray()
-    @IsMongoId({ each: true })
-    colors: string[];
-
-    @IsNumber()
-    price: number;
-
-    @IsNumber()
-    discount: number;
-
-    @IsString()
-    thumb: string;
-
-    @IsArray()
-    @IsString({ each: true })
-    images: string[];
-
-    @IsString()
-    title: string;
-
-    @IsString()
-    sku: string;
-}
