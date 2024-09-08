@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -38,6 +38,31 @@ export class User {
     @Prop()
     codeExpired: Date;
 
+
+    @Prop([{ 
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        quantity: Number,
+        colors: { type: [mongoose.Schema.Types.ObjectId], ref: 'Color' },
+        price: Number,
+        discount: Number,
+        thumb: String,
+        title: String,
+    }])
+    cart: {
+        product: mongoose.Schema.Types.ObjectId;
+        quantity: number;
+        colors?: mongoose.Schema.Types.ObjectId[];
+        price: number;
+        discount?: number;
+        thumb?: string;
+        title?: string;
+    }[];
+
+    @Prop([{ type: [mongoose.Schema.Types.ObjectId], ref: 'Product' }])
+    wishlist: mongoose.Schema.Types.ObjectId[];
+
 }
+
+
 
 export const UserSchema = SchemaFactory.createForClass(User);

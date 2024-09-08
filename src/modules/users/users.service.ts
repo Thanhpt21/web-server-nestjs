@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CartItemDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email, password } = createUserDto;
+    const { name, email, password, cart, wishlist } = createUserDto;
 
 
     const isExitsEmail = await this.isEmailExit(email);
@@ -40,7 +40,9 @@ export class UsersService {
       const user = new this.userModel({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        cart,
+        wishlist
       });
 
       await user.save();
@@ -82,8 +84,8 @@ export class UsersService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return this.userModel.findById(id).select('-password').exec(); // Trả về toàn bộ thông tin trừ mật khẩu
   }
 
   async findByEmail (email: string) {
@@ -91,7 +93,7 @@ export class UsersService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const { _id, name, phone, address, image } = updateUserDto;
+    const { _id, name, phone, address, image, cart, wishlist } = updateUserDto;
 
     // Xác thực ID người dùng
     if (!mongoose.isValidObjectId(_id)) {
@@ -104,6 +106,8 @@ export class UsersService {
     if (phone) updatePayload.phone = phone;
     if (address) updatePayload.address = address;
     if (image) updatePayload.image = image;
+    if (cart) updatePayload.cart = cart;
+    if (wishlist) updatePayload.wishlist = wishlist;
 
     try {
         // Thực hiện cập nhật
@@ -261,4 +265,39 @@ export class UsersService {
       throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
     }
   }
+
+  async addToCart(userId: string, cartItemDto: CartItemDto): Promise<User> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+        throw new BadRequestException('User not found');
+    }
+
+    // Check if the product already exists in the cart
+    const existingProductIndex = user.cart.findIndex(
+        (item) => item.product.toString() === cartItemDto.product.toString()
+    );
+
+    if (existingProductIndex > -1) {
+        // If the product exists, update the quantity
+        user.cart[existingProductIndex].quantity += cartItemDto.quantity;
+        user.cart[existingProductIndex].price = cartItemDto.price;
+        user.cart[existingProductIndex].discount = cartItemDto.discount || 0;
+        user.cart[existingProductIndex].thumb = cartItemDto.thumb;
+        user.cart[existingProductIndex].title = cartItemDto.title;
+        if (cartItemDto.colors) {
+            user.cart[existingProductIndex].colors = cartItemDto.colors;
+        }
+    } else {
+        // If the product doesn't exist, add a new entry to the cart
+        user.cart.push(cartItemDto);
+    }
+
+    return user.save();
+  }
+
+
+
 }
+
+
+
